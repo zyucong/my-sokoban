@@ -1,14 +1,6 @@
-// import Sokoban from "./game"
-
-// function wait(ms) {
-//     // some delay
-//     return new Promise((resolve) => {
-//         setTimeout(resolve, ms);
-//     });
-// }
 
 
-class Sokoban {
+export default class Sokoban {
     // static property
     // static MAX_LEVEL = 10;
     // static ITEM_WIDTH = 32;
@@ -24,7 +16,7 @@ class Sokoban {
             setTimeout(resolve, ms);
         });
     }
-    async onWin(level) {
+    onWin(level) {
         // level should be retrieved from localStorage
         const congrat = document.getElementById('result');
         congrat.innerText = "You Win!";
@@ -41,7 +33,7 @@ class Sokoban {
                 window.removeEventListener('keydown', this._command);
             this._command = (event) => {
                 const keyCode = event.keyCode;
-                switch (keyCode) {
+                switch (keycode) {
                     case 37:
                     case 65:
                         console.log('left');
@@ -87,35 +79,3 @@ class Sokoban {
         await OnWin(level);
     }
 }
-
-
-const app = new Sokoban({});
-
-const previousLevel = document.getElementById('previous-level');
-const currentLevel = document.getElementById('current-level');
-const nextLevel = document.getElementById('next-level');
-const reset = document.getElementById('reset');
-
-let gameLevel = parseInt(localStorage.getItem('gamelevel'), 10) || 1;
-
-currentLevel.addEventListener('change', ({target}) => {
-    console.log(target.value);
-    app.load(Number(target.value));
-});
-
-previousLevel.addEventListener('click', () => {
-    console.log('previous-level');
-    app.load(app.level - 1);
-});
-
-nextLevel.addEventListener('click', () => {
-    console.log('next-level');
-    app.load(app.level + 1);
-});
-
-reset.addEventListener('click', () => {
-    console.log('reset');
-    app.load(app.level);
-});
-
-window.app = app;
