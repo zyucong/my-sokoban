@@ -1,4 +1,5 @@
 import getData from "./data.js";
+import { BOUND_X, BOUND_Y } from "../../config.js";
 
 // const _level = Symbol('level');
 
@@ -41,14 +42,25 @@ export default class Sokoban {
         this.addItem('player', ...player);
     }
 
+    get player() {
+        // the class name of player is player
+        return this.container.querySelector('.player');
+    }
+
+    get level() {
+        // return this[_level];
+        return this._level;
+    }
+
     addItem(type, x, y) {
         const item = document.createElement('i');
         item.className = type;
         if (type === 'player') {
             item.className += ' down';
         }
-        item.dataset.x = x;
-        item.dataset.y = y;
+        // item.dataset.x = x;
+        // item.dataset.y = y;
+        this.moveTo(item, x, y);
         this.container.appendChild(item);
     }
 
@@ -64,14 +76,14 @@ export default class Sokoban {
         return null;
     }
 
-    get player() {
-        // the class name of player is player
-        return this.container.querySelector('.player');
-    }
+    // moveItem(item, direction) {
 
-    get level() {
-        // return this[_level];
-        return this._level;
+    // }
+    moveTo(item, x, y) {
+        item.dataset.x = x;
+        item.dataset.y = y;
+        item.style.left = `${x * this._ITEM_WIDTH}px`;
+        item.style.top = `${y * this._ITEM_WIDTH}px`;
     }
 
     move(direction) {
@@ -80,25 +92,72 @@ export default class Sokoban {
         const y = Number(player.dataset.y);
 
         let item = null;
+        let newX = null;
+        let newY = null;
 
         switch(direction) {
             case 'left':
                 item = this.getItem(x - 1, y);
+                newX = x - 1;
+                newY = y;
                 break;
             case 'right':
                 item = this.getItem(x + 1, y);
+                newX = x + 1;
+                newY = y;
                 break;
             case 'up':
                 item = this.getItem(x, y - 1);
+                newX = x;
+                newY = y - 1;
                 break;
             case 'down':
                 item = this.getItem(x, y + 1);
+                newX = x;
+                newY = y + 1;
                 break;
             default:
                 console.log('not possible');
                 break;
         }
-        console.log(item);
+        // console.log(item);
+        player.className = `player ${direction}`;
+
+        if (!item) {
+            // no obstacle along the way
+            // player.className = `player ${direction}`;
+            this.moveTo(player, newX, newY);
+            return;
+        }
+        if (item.className === 'box') {
+            // now to push the box ahead
+            if (direction === 'left' && this.isEmpty(x - 2, y)) {
+                this.moveTo(player, x - 1, y);
+                this.moveTo(item, x - 2, y);
+            } else if (direction === 'right' && this.isEmpty(x + 2, y)) {
+                this.moveTo(player, x + 1, y);
+                this.moveTo(item, x + 2, y);
+            } else if (direction === 'up' && this.isEmpty(x, y - 2)) {
+                this.moveTo(player, x, y - 1);
+                this.moveTo(item, x, y - 2);
+            } else if (direction === 'down' && this.isEmpty(x, y + 2)) {
+                this.moveTo(player, x, y + 1);
+                this.moveTo(item, x, y + 2);
+            }
+            //  || direction === 'right' && this.isEmpty(x + 2, y)
+            //  || direction === 'up' && this.isEmpty(x, y - 2)
+            //  || direction === 'down' && this.isEmpty(x, y + 2)) {
+                 // has space to move
+        }
+    }
+
+    withinRange(x, y) {
+        return x >= 0 && y >= 0 && x < BOUND_X && y < BOUND_Y;
+    }
+
+    isEmpty(x, y) {
+        console.log(this.withinRange(x, y) && !this.getItem(x, y));
+        return this.withinRange(x, y) && !this.getItem(x, y);
     }
 
     async onWin(level) {
@@ -112,6 +171,7 @@ export default class Sokoban {
         await this.wait(200);
         this.load(level + 1);
     }
+
     polling () {
         return new Promise(resolve => {
             if (this._command) 
@@ -147,6 +207,7 @@ export default class Sokoban {
             window.addEventListener('keydown', this._command, {once: true});
         });
     }
+
     isWin() {
         return false;
     }
