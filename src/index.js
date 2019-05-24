@@ -7,17 +7,23 @@ import Sokoban from "./game.js";
 //     });
 // }
 
-
-const app = new Sokoban({
-    container: document.getElementById('map')
-});
-
 const previousLevel = document.getElementById('previous-level');
 const currentLevel = document.getElementById('current-level');
 const nextLevel = document.getElementById('next-level');
 const reset = document.getElementById('reset');
 
-let gameLevel = parseInt(localStorage.getItem('gamelevel'), 10) || 1;
+// let gameLevel = parseInt(localStorage.getItem('gamelevel'), 10) || 1;
+const gameLevel = 1;
+
+const app = new Sokoban({
+    _level: gameLevel,
+    container: document.getElementById('map'),
+    onload(level) {
+        currentLevel.value = level;
+    } 
+});
+
+app.load(gameLevel);
 
 currentLevel.addEventListener('change', ({target}) => {
     console.log(target.value);

@@ -1,14 +1,18 @@
 import getData from "./data.js";
 
+// const _level = Symbol('level');
+
 export default class Sokoban {
     // static property
     // static MAX_LEVEL = 10;
     // static ITEM_WIDTH = 32;
     // some constructor
-    constructor({container}){
+    constructor({_level, container, onload}){
         this.container = container;     // map container
-        this._MAX_LEVEL = 10;
+        this.onload = onload;
+        this._MAX_LEVEL = 5;
         this._ITEM_WIDTH = 32;
+        this._level = _level;
     }
     // methods
 
@@ -23,11 +27,41 @@ export default class Sokoban {
         });
     }
 
+    // init the map
     init(level = this.level) {
         // by default it is the current level
+        console.log(level);
         this.clear();
         const {trees, boxes, goals, player} = getData(level);
         // trees.forEach(tree => console.log(tree));
+        // console.log(trees)
+        trees.forEach(tree => {this.addItem('tree', tree[0], tree[1])});
+        boxes.forEach(box => {this.addItem('box', box[0], box[1])});
+        goals.forEach(goal => {this.addItem('goal', goal[0], goal[1])});
+        this.addItem('player', ...player);
+    }
+
+    addItem(type, x, y) {
+        const item = document.createElement('i');
+        item.className = type;
+        if (type === 'player') {
+            item.className += ' down';
+        }
+        item.dataset.x = x;
+        item.dataset.y = y;
+        this.container.appendChild(item);
+    }
+
+    getItem(x, y) {
+        const items = this.container.children;
+        for (const item of items) {
+            if (Number(item.dataset.x) === x
+             && Number(item.dataset.y) === y
+             && item.className !== 'goal') {
+                 return item;
+             }
+        }
+        return null;
     }
 
     get player() {
@@ -35,24 +69,36 @@ export default class Sokoban {
         return this.container.querySelector('.player');
     }
 
+    get level() {
+        // return this[_level];
+        return this._level;
+    }
+
     move(direction) {
         const player = this.player;
         const x = Number(player.dataset.x);
         const y = Number(player.dataset.y);
 
-        switch(direnction) {
+        let item = null;
+
+        switch(direction) {
             case 'left':
+                item = this.getItem(x - 1, y);
                 break;
             case 'right':
+                item = this.getItem(x + 1, y);
                 break;
             case 'up':
+                item = this.getItem(x, y - 1);
                 break;
             case 'down':
+                item = this.getItem(x, y + 1);
                 break;
             default:
                 console.log('not possible');
                 break;
         }
+        console.log(item);
     }
 
     async onWin(level) {
@@ -106,16 +152,21 @@ export default class Sokoban {
     }
 
     async load(level) {
-        if ( Number.isNaN(level) || level <= 0 || level > this._MAX_LEVEL) {
+        if ( Number.isNaN(level) || level <= 0 
+        || level > this._MAX_LEVEL) {
             level = 1;
         }
-        console.log(level);
+        // this[_level] = level;
+        this._level = level;
+        // console.log(level);
         this.init(level);
+        this.onload(level);
         do {
             const direction = await this.polling();
             if (direction) {
                 // move
                 console.log(direction);
+                this.move(direction);
             }
         } while (!this.isWin());
         await OnWin(level);
