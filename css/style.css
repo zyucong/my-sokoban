@@ -51,6 +51,25 @@ body {
     background-repeat: no-repeat;
 }
 
+#result {
+    position: absolute;
+    z-index: 999;
+    color: #fff;
+    font-weight: bold;
+    font-size: 2rem;
+    left: 50%;
+    top: 88%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: all .3s;
+}
+
+#result.show {
+    top: 38%;
+    opacity: 1;
+    transition: all .6s ease-out;
+}
+
 .tree {
     background-position: -96px 0;
 }

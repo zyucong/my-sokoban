@@ -20,7 +20,7 @@ const app = new Sokoban({
     container: document.getElementById('map'),
     onload(level) {
         currentLevel.value = level;
-    } 
+    }
 });
 
 app.load(gameLevel);

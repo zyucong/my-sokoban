@@ -131,6 +131,7 @@ export default class Sokoban {
         }
         if (item.className === 'box') {
             // now to push the box ahead
+            // to see if it is possible to push
             if (direction === 'left' && this.isEmpty(x - 2, y)) {
                 this.moveTo(player, x - 1, y);
                 this.moveTo(item, x - 2, y);
@@ -156,12 +157,14 @@ export default class Sokoban {
     }
 
     isEmpty(x, y) {
-        console.log(this.withinRange(x, y) && !this.getItem(x, y));
+        // if is possible to push the box towards somewhere
+        // console.log(this.withinRange(x, y) && !this.getItem(x, y));
         return this.withinRange(x, y) && !this.getItem(x, y);
     }
 
-    async onWin(level) {
+    async onwin(level) {
         // level should be retrieved from localStorage
+        // console.log('win');
         const congrat = document.getElementById('result');
         congrat.innerText = "You Win!";
         congrat.className = 'show';
@@ -208,8 +211,21 @@ export default class Sokoban {
         });
     }
 
-    isWin() {
+    isIn(box) {
+        // to see if a specific box is in goal position
+        const goals = this.container.querySelectorAll('.goal');
+        for (let goal of goals) {
+            if (box.dataset.x === goal.dataset.x && box.dataset.y === goal.dataset.y) 
+                return true;
+        }
         return false;
+    }
+
+    isWin() {
+        // to see if every box is in goal position
+        const boxes = this.container.querySelectorAll('.box');
+        return Array.from(boxes).every(box => this.isIn(box));
+        // return false;
     }
 
     async load(level) {
@@ -226,10 +242,10 @@ export default class Sokoban {
             const direction = await this.polling();
             if (direction) {
                 // move
-                console.log(direction);
+                // console.log(direction);
                 this.move(direction);
             }
         } while (!this.isWin());
-        await OnWin(level);
+        await this.onwin(level);
     }
 }
