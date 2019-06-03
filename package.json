@@ -1,0 +1,27 @@
+{
+  "name": "my-sokoban",
+  "version": "1.0.0",
+  "description": "try to play with webpack lol",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zyucong/my-sokoban.git"
+  },
+  "author": "zhu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zyucong/my-sokoban/issues"
+  },
+  "homepage": "https://github.com/zyucong/my-sokoban#readme",
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2"
+  }
+}
